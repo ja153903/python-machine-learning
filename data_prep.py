@@ -42,22 +42,30 @@ def plot_decisions_regions(X, y, classifier, test_idx=None, resolution=0.2):
                     marker='o', s=100,
                     label='test set')
 
-iris = load_iris()
+def get_data():
+    iris = load_iris()
 
-X = iris.data[:, [2, 3]]
-y = iris.target
+    X = iris.data[:, [2, 3]]
+    y = iris.target
 
-X_train, X_test, y_train, y_test = train_test_split(X, y,
-                                    test_size=0.3,
-                                    random_state=42,
-                                    stratify=y)
+    X_train, X_test, y_train, y_test = train_test_split(X, y,
+                                        test_size=0.3,
+                                        random_state=42,
+                                        stratify=y)
 
-sc = StandardScaler()
-sc.fit(X_train)
+    sc = StandardScaler()
+    sc.fit(X_train)
 
-X_train_std = sc.transform(X_train)
-X_test_std = sc.transform(X_test)
+    X_train_std = sc.transform(X_train)
+    X_test_std = sc.transform(X_test)
 
-X_combined_std = np.vstack((X_train_std, X_test_std))
-y_combined = np.hstack((y_train, y_test))
+    X_combined_std = np.vstack((X_train_std, X_test_std))
+    y_combined = np.hstack((y_train, y_test))
+
+    return {
+        'non-std': [X_train, X_test, y_train, y_test],
+        'std': [X_train_std, X_test_std]
+    }
+
+    
 
