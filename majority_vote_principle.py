@@ -50,3 +50,50 @@ for clf, label in zip(all_clf, clf_labels):
         scoring='roc_auc'
     )
     print('Accuracy: %0.2f (+/- %0.2f) [%s]' % (scores.mean(), scores.std(), label))
+
+
+from sklearn.metrics import roc_curve
+from sklearn.metrics import auc
+import matplotlib.pyplot as plt 
+
+colors = ['black', 'orange', 'blue', 'green']
+
+linestyles = [':', '--', '-.', '-']
+for clf, label, clr, ls in zip(all_clf, clf_labels, colors, linestyles):
+    y_pred = clf.fit(X_train, y_train).predict_proba(X_test)[:, 1]
+    fpr, tpr, thresholds = roc_curve(y_true=y_test, y_score=y_pred)
+    roc_auc = auc(x=fpr, y=tpr)
+    plt.plot(fpr, tpr,
+            color=clr,
+            linestyle=ls,
+            label='%s (auc=%0.2f)' % (label, roc_auc))
+plt.legend(loc='lower right')
+plt.plot([0, 1], [0, 1],
+        linestyle='--',
+        color='gray',
+        linewidth=2)
+plt.xlim([-0.1, 1.1])
+plt.ylim([-0.1, 1.1])
+plt.grid(alpha=0.5)
+plt.xlabel('False positive rate (FPR)')
+plt.ylabel('True positive rate (TPR)')
+plt.show()
+    
+from sklearn.model_selection import GridSearchCV
+params = {
+    'decisiontreeclassifier__max_depth': [1, 2],
+    'pipeline-1__clf__C': [0.001, 0.1, 100.0]
+}
+
+grid = GridSearchCV(estimator=mv_clf,
+                    param_grid=params,
+                    cv=10,
+                    scoring='roc_auc')
+grid.fit(X_train, y_train)
+
+for params, mean_score, scores in grid.grid_scores_:
+    print("%0.3f +/- %0.2f %r" % (mean_score, scores.std() / 2, params))
+
+print("Best parameters: %s" % grid.best_params_)
+
+print("Accuracy: %.2f" % grid.best_score_)
