@@ -1,2 +1,6 @@
 __pycache__/
 .ipynb_checkpoints/
+aclImdb
+aclImdb_v1.tar.gz
+movie_data.csv
+.vscode/
