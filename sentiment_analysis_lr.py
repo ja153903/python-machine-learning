@@ -17,8 +17,33 @@ def preprocessor(text):
     text = (re.sub('[\W]+', ' ', text.lower()) + ' '.join(emoticons).replace('-', ''))
     return text
 
+# a set with stopwords from the English language
+stop = stopwords.words('english')
+
 def tokenizer(text):
-    return text.split()
+    text = re.sub('<[^>]*>', '', text)
+    emoticons = re.findall('(?::|;|=)(?:-)?(?:\)|\(|D|P)', text)
+    text = (re.sub('[\W]+', ' ', text.lower()) + ' '.join(emoticons).replace('-', ''))
+    tokenized = [w for w in text.split() if w not in stop]
+    return tokenized
+
+def stream_docs(path):
+    with open(path, 'r', encoding='utf-8') as csv:
+        next(csv)
+        for line in csv:
+            text, label = line[:-3], int(line[-2])
+            yield, text, label
+
+def get_minibatch(doc_stream, size):
+    docs, y = [], []
+    try:
+        for _ in range(size):
+            text, label = next(doc_stream)
+            docs.append(text)
+            y.append(label)
+    except StopIteration:
+        return None, None
+    return docs, y
 
 porter = PorterStemmer()
 def tokenizer_porter(text):
@@ -35,8 +60,6 @@ y_train = df.loc[:25, 'sentiment'].values
 X_test = df.loc[25:50, 'review'].values
 y_test = df.loc[25:50, 'sentiment'].values
 
-# a set with stopwords from the English language
-stop = stopwords.words('english')
 
 tfidf = TfidfVectorizer(
     strip_accents=None,
