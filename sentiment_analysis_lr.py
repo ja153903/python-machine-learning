@@ -32,7 +32,7 @@ def stream_docs(path):
         next(csv)
         for line in csv:
             text, label = line[:-3], int(line[-2])
-            yield, text, label
+            yield text, label
 
 def get_minibatch(doc_stream, size):
     docs, y = [], []
@@ -55,10 +55,10 @@ df['review'] = df['review'].apply(preprocessor)
 
 # nltk.download('stopwords')
 
-X_train = df.loc[:25, 'review'].values
-y_train = df.loc[:25, 'sentiment'].values
-X_test = df.loc[25:50, 'review'].values
-y_test = df.loc[25:50, 'sentiment'].values
+X_train = df.loc[:25000, 'review'].values
+y_train = df.loc[:25000, 'sentiment'].values
+X_test = df.loc[25000:, 'review'].values
+y_test = df.loc[25000:, 'sentiment'].values
 
 
 tfidf = TfidfVectorizer(
